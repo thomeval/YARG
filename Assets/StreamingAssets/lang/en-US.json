@@ -730,12 +730,10 @@
             "VideoCalibration": {
                 "Name": "Video Calibration (ms)",
                 "Description": "Video calibration in milliseconds. Use the calibrator to automatically calibrate. This accounts for delays between the game's processing and the actual frame being displayed."
-            },
-			{
-				"VoiceActivatedVocalStarPower" : {
-					"Name": "Voice Activated Star Power (Vocals)",
-					"Description": "If enabled, vocalists can activate their Star Power by making some noise when not singing (or by singing badly). The 'Star Power Activate' keybinding can still be used to activate Star Power regardless of this setting. Note that this setting has no effect on other instruments."
-				}
+            },			
+			"VoiceActivatedVocalStarPower" : {
+				"Name": "Voice Activated Star Power (Vocals)",
+				"Description": "If enabled, vocalists can activate their Star Power by making noise when not singing (or by singing badly). Keybindings can be used regardless of this setting."
 			},
             "VocalMonitoring": {
                 "Name": "Vocal Monitoring Volume",

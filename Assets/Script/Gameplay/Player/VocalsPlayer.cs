@@ -1,14 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
-using YARG.Audio;
 using YARG.Core;
 using YARG.Core.Audio;
 using YARG.Core.Chart;
 using YARG.Core.Engine;
 using YARG.Core.Engine.Vocals;
 using YARG.Core.Engine.Vocals.Engines;
-using YARG.Core.Game;
 using YARG.Core.Input;
 using YARG.Gameplay.HUD;
 using YARG.Helpers;
@@ -20,7 +17,7 @@ namespace YARG.Gameplay.Player
     public class VocalsPlayer : BasePlayer
     {
         public VocalsEngineParameters EngineParams { get; private set; }
-        public VocalsEngine           Engine       { get; private set; }
+        public VocalsEngine Engine { get; private set; }
 
         public override BaseEngine BaseEngine => Engine;
 
@@ -112,8 +109,9 @@ namespace YARG.Gameplay.Player
         {
             if (!GameManager.IsReplay)
             {
+                var singToActivateStarPower = Settings.SettingsManager.Settings.VoiceActivatedVocalStarPower.Value;
                 // Create the engine params from the engine preset
-                EngineParams = Player.EnginePreset.Vocals.Create(StarMultiplierThresholds, Player.Profile.CurrentDifficulty, MicDevice.UPDATES_PER_SECOND);
+                EngineParams = Player.EnginePreset.Vocals.Create(StarMultiplierThresholds, Player.Profile.CurrentDifficulty, MicDevice.UPDATES_PER_SECOND, singToActivateStarPower);
             }
             else
             {
