@@ -55,6 +55,7 @@ namespace YARG.Settings
                 nameof(Settings.ShowCursorTimer),
                 nameof(Settings.PauseOnDeviceDisconnect),
                 nameof(Settings.PauseOnFocusLoss),
+                nameof(Settings.VoiceActivatedVocalStarPower),
                 nameof(Settings.WrapAroundNavigation),
                 nameof(Settings.AmIAwesome),
             },

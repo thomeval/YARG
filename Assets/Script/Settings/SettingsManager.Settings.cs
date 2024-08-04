@@ -80,6 +80,8 @@ namespace YARG.Settings
             public ToggleSetting PauseOnDeviceDisconnect { get; } = new(true);
             public ToggleSetting PauseOnFocusLoss { get; } = new(true);
 
+            public ToggleSetting VoiceActivatedVocalStarPower { get; } = new(false);
+
             public ToggleSetting WrapAroundNavigation { get; } = new(true);
             public ToggleSetting AmIAwesome { get; } = new(false);
 
