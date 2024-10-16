@@ -108,24 +108,28 @@ namespace YARG.Scores
         {
             try
             {
+                bool bandScoreValid = IsBandScoreValid(gameRecord.SongSpeed);
+
                 int rowsAdded = 0;
 
                 // Add the game record
-                gameRecord.GameVersion = GlobalVariables.Instance.CurrentVersion;
-                rowsAdded += _db.Insert(gameRecord);
+                if (bandScoreValid)
+                {
+                    gameRecord.GameVersion = GlobalVariables.Instance.CurrentVersion;
+                    rowsAdded += _db.Insert(gameRecord);
+                }
 
                 // Assign the proper score entry IDs and checksums
                 foreach (var playerEntry in playerEntries)
                 {
-                    playerEntry.GameRecordId = gameRecord.Id;
+                    playerEntry.GameRecordId = bandScoreValid ? gameRecord.Id : null;
 
                     // Record the player's info in the "Players" table
                     string name = PlayerContainer.GetProfileById(playerEntry.PlayerId).Name;
-                    RecordPlayerInfo(playerEntry.PlayerId, name);
+                    RecordPlayerInfo(playerEntry.PlayerId, name);                  
                 }
 
                 rowsAdded += _db.InsertAll(playerEntries);
-
                 YargLogger.LogFormatInfo("Successfully added {0} rows into score database.", rowsAdded);
 
                 var songChecksum = HashWrapper.Create(gameRecord.SongChecksum);
@@ -136,8 +140,10 @@ namespace YARG.Scores
                     UpdatePlayerHighScores(songChecksum, playerEntries.First());
                 }
 
-                UpdateBandHighScore(songChecksum, gameRecord);
-
+                if (bandScoreValid)
+                {
+                    UpdateBandHighScore(songChecksum, gameRecord);
+                }
                 YargLogger.LogInfo("Recorded high score for song.");
             }
             catch (Exception e)

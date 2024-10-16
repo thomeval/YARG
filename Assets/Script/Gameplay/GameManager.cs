@@ -445,10 +445,6 @@ namespace YARG.Gameplay
 
         private void RecordScores(ReplayInfo replayInfo)
         {
-            if (!ScoreContainer.IsBandScoreValid(SongSpeed))
-            {
-                return;
-            }
 
             // Get all of the individual player score entries
             var playerEntries = new List<PlayerScoreRecord>();
