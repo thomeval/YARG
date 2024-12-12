@@ -70,6 +70,8 @@ namespace YARG.Gameplay.Player
         {
             // If on bass, replace the star multiplier threshold
             bool isBass = Player.Profile.CurrentInstrument == Instrument.FiveFretBass;
+            bool isKeys = Player.Profile.CurrentInstrument == Instrument.Keys;
+
             if (isBass)
             {
                 StarMultiplierThresholds = BassStarMultiplierThresholds;
@@ -78,8 +80,7 @@ namespace YARG.Gameplay.Player
             if (GameManager.ReplayInfo == null)
             {
                 // Create the engine params from the engine preset
-                EngineParams = Player.EnginePreset.FiveFretGuitar.Create(StarMultiplierThresholds, isBass);
-                //EngineParams = EnginePreset.Precision.FiveFretGuitar.Create(StarMultiplierThresholds, isBass);
+                EngineParams = Player.EnginePreset.FiveFretGuitar.Create(StarMultiplierThresholds, isBass, isKeys);
             }
             else
             {
