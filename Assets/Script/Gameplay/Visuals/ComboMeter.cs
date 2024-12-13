@@ -34,21 +34,21 @@ namespace YARG.Gameplay.Visuals
             _comboMesh.material.SetColor(_multiplierColorProperty, color);
         }
 
-        public void SetCombo(int multiplier, int maxMultiplier, int combo)
+        public void SetCombo(int multiplier, int maxMultiplier, int combo, int comboPerMultiplier)
         {
             if (multiplier != 1)
                 _multiplierText.SetTextFormat("{0}<sub>x</sub>", multiplier);
             else
                 _multiplierText.text = string.Empty;
 
-            int index = combo % 10;
+            int index = combo % comboPerMultiplier;
             if (combo != 0 && index == 0)
             {
-                index = 10;
+                index = comboPerMultiplier;
             }
             else if (multiplier == maxMultiplier)
             {
-                index = 10;
+                index = comboPerMultiplier;
             }
 
             _comboMesh.material.SetFloat(_spriteIndexProperty, index);
