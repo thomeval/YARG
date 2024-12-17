@@ -147,7 +147,8 @@ namespace YARG.Menu.History
                 else
                 {
                     YargLogger.LogFormatWarning("({0}, {1}/{2}) FAILED verification",
-                        profile.Name, profile.CurrentDifficulty, profile.CurrentDifficulty);
+                        profile.Name, profile.CurrentInstrument, profile.CurrentDifficulty);
+                    YargLogger.LogWarning(ReplayAnalyzer.PrintStatDifferences(analysisResult.OriginalStats, analysisResult.ResultStats));
                 }
             }
         }
