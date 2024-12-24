@@ -42,8 +42,8 @@ namespace YARG.Gameplay.Player
 
         public override int[] StarScoreThresholds { get; protected set; }
 
-        private InstrumentDifficulty<VocalNote> NoteTrack { get; set; }
-        private InstrumentDifficulty<VocalNote> OriginalNoteTrack { get; set; }
+        private InstrumentDifficulty<VocalNote>[] NoteTracks { get; set; }
+        private InstrumentDifficulty<VocalNote>[] OriginalNoteTracks { get; set; }
 
         private MicInputContext _inputContext;
 
@@ -92,15 +92,12 @@ namespace YARG.Gameplay.Player
                 main.startColor = VocalTrack.Colors[partIndex];
             }
 
-            // Get the notes from the specific harmony or solo part
-
             var multiTrack = chart.GetVocalsTrack(Player.Profile.CurrentInstrument);
 
-            var track = multiTrack.Parts[partIndex];
-            player.Profile.ApplyVocalModifiers(track);
+            player.Profile.ApplyVocalModifiers(multiTrack);
 
-            OriginalNoteTrack = track.CloneAsInstrumentDifficulty();
-            NoteTrack = OriginalNoteTrack;
+            OriginalNoteTracks = multiTrack.CloneAsInstrumentDifficulties();
+            NoteTracks = OriginalNoteTracks.ToArray();
 
             _phraseIndex = -1;
 
@@ -108,8 +105,8 @@ namespace YARG.Gameplay.Player
 
             hud.Initialize(player.EnginePreset);
             _hud = hud;
-
-            percussionTrack.Initialize(NoteTrack.Notes);
+          
+            percussionTrack.Initialize(NoteTracks.First().Notes);
             _percussionTrack = percussionTrack;
 
             _hud.ShowPlayerName(player, needleIndex);
@@ -175,7 +172,7 @@ namespace YARG.Gameplay.Player
             // The hit window can just be taken from the params
             HitWindow = EngineParams.HitWindow;
 
-            var engine = new YargVocalsEngine(NoteTrack, SyncTrack, EngineParams, Player.Profile.IsBot);
+            var engine = new YargVocalsEngine(NoteTracks, SyncTrack, EngineParams, Player.Profile.IsBot);
 
             engine.OnStarPowerPhraseHit += _ => OnStarPowerPhraseHit();
             engine.OnStarPowerStatus += OnStarPowerStatus;
@@ -241,10 +238,13 @@ namespace YARG.Gameplay.Player
         {
             Engine.Reset(true);
 
-            if (NoteTrack.Notes.Count > 0)
+            foreach (var track in NoteTracks)
             {
-                NoteTrack.Notes[0].OverridePreviousNote();
-                NoteTrack.Notes[^1].OverrideNextNote();
+                if (track.Notes.Count > 0)
+                {
+                    track.Notes[0].OverridePreviousNote();
+                    track.Notes[^1].OverrideNextNote();
+                }
             }
 
             _phraseIndex = -1;
@@ -434,22 +434,24 @@ namespace YARG.Gameplay.Player
                 return;
             }
 
+            var firstNoteTrack = NoteTracks[0];
+
             // Since phrases start at the note, and not sometime before it, use
             // the end times of phrases instead (where the phrase lines are). Problem
             // with this is that we still gotta account for the first phrase, so use
             // an index of -1 for that.
             while (_phraseIndex == -1 ||
-                (_phraseIndex < NoteTrack.Notes.Count && NoteTrack.Notes[_phraseIndex].TimeEnd <= time))
+                (_phraseIndex < firstNoteTrack.Notes.Count && firstNoteTrack.Notes[_phraseIndex].TimeEnd <= time))
             {
                 _phraseIndex++;
 
                 // End if that's the last note
-                if (_phraseIndex >= NoteTrack.Notes.Count)
+                if (_phraseIndex >= firstNoteTrack.Notes.Count)
                 {
                     break;
                 }
 
-                var phrase = NoteTrack.Notes[_phraseIndex];
+                var phrase = firstNoteTrack.Notes[_phraseIndex];
 
                 bool hasPercussion = false;
                 uint totalTime = 0;
@@ -472,15 +474,17 @@ namespace YARG.Gameplay.Player
 
         public override void SetPracticeSection(uint start, uint end)
         {
-            var practiceNotes = OriginalNoteTrack.Notes.Where(n => n.Tick >= start && n.Tick < end).ToList();
+            for (int x = 0; x < NoteTracks.Length; x++)
+            {
+                var practiceNotes = OriginalNoteTracks[x].Notes.Where(n => n.Tick >= start && n.Tick < end).ToList();
 
-            NoteTrack = new InstrumentDifficulty<VocalNote>(
-                OriginalNoteTrack.Instrument,
-                OriginalNoteTrack.Difficulty,
-                practiceNotes,
-                OriginalNoteTrack.Phrases,
-                OriginalNoteTrack.TextEvents);
-
+                NoteTracks[x] = new InstrumentDifficulty<VocalNote>(
+                    OriginalNoteTracks[x].Instrument,
+                    OriginalNoteTracks[x].Difficulty,
+                    practiceNotes,
+                    OriginalNoteTracks[x].Phrases,
+                    OriginalNoteTracks[x].TextEvents);
+            }
             _phraseIndex = -1;
 
             Engine = CreateEngine();
