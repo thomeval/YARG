@@ -94,7 +94,10 @@ namespace YARG.Gameplay.Player
 
             var multiTrack = chart.GetVocalsTrack(Player.Profile.CurrentInstrument);
 
-            player.Profile.ApplyVocalModifiers(multiTrack);
+            foreach (var part in multiTrack.Parts)
+            {
+                player.Profile.ApplyVocalModifiers(part);
+            }
 
             OriginalNoteTracks = multiTrack.CloneAsInstrumentDifficulties();
             NoteTracks = OriginalNoteTracks.ToArray();
