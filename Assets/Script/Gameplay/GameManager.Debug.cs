@@ -7,6 +7,7 @@ using UnityEngine.InputSystem.LowLevel;
 using YARG.Assets.Script.Gameplay.Player;
 using YARG.Core.Audio;
 using YARG.Core.Extensions;
+using YARG.Gameplay.HUD;
 using YARG.Gameplay.Player;
 using YARG.Integration;
 
@@ -389,13 +390,18 @@ namespace YARG.Gameplay
 
                     case VocalsPlayer vocalsPlayer:
                     {
-                        using var text = ZString.CreateStringBuilder(true);
+                        using var text = ZString.CreateStringBuilder(false);
 
                         var engine = vocalsPlayer.Engine;
+                        var hasNotes = (engine.PhraseTicksTotal ?? 0) > 0;
+                        var phraseTickPercent = !hasNotes ? 1 : engine.PhraseTicksHit / engine.PhraseTicksTotal.Value;
+                        var phraseScorePercent = phraseTickPercent / vocalsPlayer.EngineParams.PhraseHitPercent;
+                        var phraseRating = hasNotes ? VocalsPlayerHUD.GetVocalPerformanceText(phraseScorePercent) : "NA";
                         text.AppendLine("State:");
                         text.AppendFormat("- Last pitch sang: {0:0.000}\n", engine.PitchSang);
-                        text.AppendFormat("- Current phrase ticks hit: {0:0.000}/{1}\n",
-                            engine.PhraseTicksHit, engine.PhraseTicksTotal);
+                        text.AppendFormat("- Current phrase ticks hit: {0:0}/{1} ({2:P0})\n",
+                            engine.PhraseTicksHit, engine.PhraseTicksTotal, phraseTickPercent);
+                        text.AppendFormat("- Current phrase score: {0:P0} {1}\n", phraseScorePercent, phraseRating);
                         text.AppendFormat("- Last sing tick: {0}\n", engine.LastSingTick);
 
                         var stats = vocalsPlayer.Engine.EngineStats;
