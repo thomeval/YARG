@@ -70,6 +70,7 @@ namespace YARG.Gameplay.Player
         public float Stars => BaseStats.Stars;
 
         public int Score => BaseStats.TotalScore;
+        public int BandBonusScore => BaseStats.BandBonusScore;
         public int Combo => BaseStats.Combo;
         public int NotesHit => BaseStats.NotesHit;
 
@@ -102,8 +103,6 @@ namespace YARG.Gameplay.Player
         private float _noteSpeedDifficultyScale;
 
         protected EngineManager.EngineContainer EngineContainer;
-
-        protected bool IsCrowdMuted { get; set; }
 
         protected override void GameplayAwake()
         {
@@ -295,8 +294,8 @@ namespace YARG.Gameplay.Player
 
         protected void OnGameInput(ref GameInput input)
         {
-            // Ignore completely if the song hasn't started yet
-            if (!GameManager.Started)
+            // Ignore completely if the song hasn't started yet or player failed
+            if (!GameManager.Started || GameManager.PlayerHasFailed)
                 return;
 
             // Ignore while paused
